@@ -17,10 +17,14 @@
   <div id="fallback" class="no-alerts"></div>
 
   <script>
-    // Ask for permission to show notifications
-    if (Notification.permission !== "granted") {
-      Notification.requestPermission();
-    }
+    // Delay notification permission request until page loads
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        if (Notification.permission !== "granted") {
+          Notification.requestPermission();
+        }
+      }, 1000); // 1-second delay
+    });
 
     // Function to send a browser notification
     function sendNotification(message) {
