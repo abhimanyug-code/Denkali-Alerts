@@ -3,6 +3,7 @@
 <head>
   <title>Denkali Alerts</title>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <link rel="manifest" href="manifest.json">
   <style>
     body { font-family: Arial, sans-serif; padding: 20px; background-color: #f9f9f9; }
     h2 { color: #2c3e50; }
@@ -17,16 +18,23 @@
   <div id="fallback" class="no-alerts"></div>
 
   <script>
-    // Delay notification permission request until page loads
+    // Register service worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js')
+        .then(reg => console.log("Service Worker registered", reg))
+        .catch(err => console.error("Service Worker registration failed", err));
+    }
+
+    // Ask for notification permission after page load
     window.addEventListener('load', () => {
       setTimeout(() => {
         if (Notification.permission !== "granted") {
           Notification.requestPermission();
         }
-      }, 1000); // 1-second delay
+      }, 1000);
     });
 
-    // Function to send a browser notification
+    // Send browser notification (fallback if push not used)
     function sendNotification(message) {
       if (Notification.permission === "granted") {
         new Notification("Denkali Alert", {
@@ -64,7 +72,7 @@
               const li = document.createElement('li');
               li.textContent = message;
               alertList.appendChild(li);
-              sendNotification(message); // Trigger push notification
+              sendNotification(message); // fallback notification
               found = true;
             }
           }
