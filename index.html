@@ -44,7 +44,7 @@
       }
     }
 
-    const sheetUrl = 'https://corsproxy.io/?https://docs.google.com/spreadsheets/d/e/2PACX-1vRxrM7GuYTQlt9-O6JUfwWBVOfd297pisjB-IWL7pAhBRKS29iddyDQdutjTPKFf0NKt92HRM_xHVHM/pub?gid=782223439&single=true&output=csv';
+    const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRxrM7GuYTQlt9-O6JUfwWBVOfd297pisjB-IWL7pAhBRKS29iddyDQdutjTPKFf0NKt92HRM_xHVHM/pub?gid=782223439&single=true&output=csv';
 
     fetch(sheetUrl)
       .then(response => response.text())
@@ -63,6 +63,8 @@
         rows.forEach(row => {
           const dateStr = row[0]; // Column A
           const message = row[1]; // Column B
+
+          if (!dateStr || !message) return;
 
           const cellDate = new Date(dateStr);
           if (!isNaN(cellDate)) {
