@@ -25,25 +25,6 @@
         .catch(err => console.error("Service Worker registration failed", err));
     }
 
-    // Ask for notification permission after page load
-    window.addEventListener('load', () => {
-      setTimeout(() => {
-        if (Notification.permission !== "granted") {
-          Notification.requestPermission();
-        }
-      }, 1000);
-    });
-
-    // Send browser notification (fallback if push not used)
-    function sendNotification(message) {
-      if (Notification.permission === "granted") {
-        new Notification("Denkali Alert", {
-          body: message,
-          icon: "https://cdn-icons-png.flaticon.com/512/565/565547.png"
-        });
-      }
-    }
-
     const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRxrM7GuYTQlt9-O6JUfwWBVOfd297pisjB-IWL7pAhBRKS29iddyDQdutjTPKFf0NKt92HRM_xHVHM/pub?gid=782223439&single=true&output=csv';
 
     fetch(sheetUrl)
@@ -74,7 +55,6 @@
               const li = document.createElement('li');
               li.textContent = message;
               alertList.appendChild(li);
-              sendNotification(message); // fallback notification
               found = true;
             }
           }
