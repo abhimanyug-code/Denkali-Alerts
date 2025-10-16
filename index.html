@@ -25,6 +25,40 @@
         .catch(err => console.error("Service Worker registration failed", err));
     }
 
+    // Request notification permission and subscribe user
+    window.addEventListener('load', () => {
+      setTimeout(async () => {
+        if ('Notification' in window) {
+          const permission = await Notification.requestPermission();
+          if (permission === "granted") {
+            subscribeUser();
+          }
+        }
+      }, 1000);
+    });
+
+    // Subscribe user to push notifications
+    async function subscribeUser() {
+      const registration = await navigator.serviceWorker.ready;
+      const subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: '<YOUR_PUBLIC_VAPID_KEY>'
+      });
+
+      console.log("Push subscription object:", JSON.stringify(subscription));
+      // TODO: Send this subscription to your backend (Apps Script, Firebase, etc.)
+    }
+
+    // Send browser notification (fallback)
+    function sendNotification(message) {
+      if (Notification.permission === "granted") {
+        new Notification("Denkali Alert", {
+          body: message,
+          icon: "https://cdn-icons-png.flaticon.com/512/565/565547.png"
+        });
+      }
+    }
+
     const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRxrM7GuYTQlt9-O6JUfwWBVOfd297pisjB-IWL7pAhBRKS29iddyDQdutjTPKFf0NKt92HRM_xHVHM/pub?gid=782223439&single=true&output=csv';
 
     fetch(sheetUrl)
@@ -55,6 +89,7 @@
               const li = document.createElement('li');
               li.textContent = message;
               alertList.appendChild(li);
+              sendNotification(message); // fallback notification
               found = true;
             }
           }
