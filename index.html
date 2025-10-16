@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Denkali Alerts</title>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background-color: #f9f9f9; }
+    h2 { color: #2c3e50; }
+    ul { list-style-type: none; padding: 0; }
+    li { background: #e8f0fe; margin: 8px 0; padding: 10px; border-radius: 5px; }
+    .no-alerts { color: #888; font-style: italic; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h2>Alerts for Tomorrow</h2>
+  <ul id="alertList"></ul>
+  <div id="fallback" class="no-alerts"></div>
+
+  <script>
+    const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRxrM7GuYTQlt9-O6JUfwWBVOfd297pisjB-IWL7pAhBRKS29iddyDQdutjTPKFf0NKt92HRM_xHVHM/pub?gid=782223439&single=true&output=csv';
+
+    fetch(sheetUrl)
+      .then(response => response.text())
+      .then(csvText => {
+        const parsed = Papa.parse(csvText, { header: false });
+        const rows = parsed.data.slice(1); // skip header
+
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const normalizedTomorrow = new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate());
+
+        const alertList = document.getElementById('alertList');
+        const fallback = document.getElementById('fallback');
+        let found = false;
+
+        rows.forEach(row => {
+          const dateStr = row[0]; // Column A
+          const message = row[1]; // Column B
+
+          const cellDate = new Date(dateStr);
+          if (!isNaN(cellDate)) {
+            const normalizedCellDate = new Date(cellDate.getFullYear(), cellDate.getMonth(), cellDate.getDate());
+
+            if (normalizedCellDate.getTime() === normalizedTomorrow.getTime()) {
+              const li = document.createElement('li');
+              li.textContent = message;
+              alertList.appendChild(li);
+              found = true;
+            }
+          }
+        });
+
+        if (!found) {
+          fallback.textContent = "No alerts scheduled for tomorrow.";
+        }
+      })
+      .catch(error => {
+        document.getElementById('fallback').textContent = "Error loading alerts.";
+        console.error("Fetch error:", error);
+      });
+  </script>
+</body>
+</html>
