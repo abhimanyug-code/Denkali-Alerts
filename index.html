@@ -17,7 +17,22 @@
   <div id="fallback" class="no-alerts"></div>
 
   <script>
-    const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRxrM7GuYTQlt9-O6JUfwWBVOfd297pisjB-IWL7pAhBRKS29iddyDQdutjTPKFf0NKt92HRM_xHVHM/pub?gid=782223439&single=true&output=csv';
+    // Ask for permission to show notifications
+    if (Notification.permission !== "granted") {
+      Notification.requestPermission();
+    }
+
+    // Function to send a browser notification
+    function sendNotification(message) {
+      if (Notification.permission === "granted") {
+        new Notification("Denkali Alert", {
+          body: message,
+          icon: "https://cdn-icons-png.flaticon.com/512/565/565547.png"
+        });
+      }
+    }
+
+    const sheetUrl = 'https://corsproxy.io/?https://docs.google.com/spreadsheets/d/e/2PACX-1vRxrM7GuYTQlt9-O6JUfwWBVOfd297pisjB-IWL7pAhBRKS29iddyDQdutjTPKFf0NKt92HRM_xHVHM/pub?gid=782223439&single=true&output=csv';
 
     fetch(sheetUrl)
       .then(response => response.text())
@@ -45,6 +60,7 @@
               const li = document.createElement('li');
               li.textContent = message;
               alertList.appendChild(li);
+              sendNotification(message); // Trigger push notification
               found = true;
             }
           }
